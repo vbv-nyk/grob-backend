@@ -8,6 +8,7 @@ import { initializeMongoDB } from './mongodb/intialize';
 import gameRouter from "./routes/game";
 import challengeRouter from "./routes/challenge";
 import leaderboardRouter from "./routes/leaderboard";
+import cors from "cors"
 
 dotenv.config();
 initializeMongoDB();
@@ -18,6 +19,7 @@ initializeMongoDB();
 
 // const credentials = { key: privateKey, cert: certificate, ca: ca };
 const app = express();
+app.use(cors())
 
 app.use(express.json());
 app.use('/game', gameRouter);

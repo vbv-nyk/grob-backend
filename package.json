@@ -13,7 +13,9 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@types/cors": "^2.8.17",
     "@types/mongoose": "^5.11.97",
+    "cors": "^2.8.5",
     "dotenv": "^16.4.7",
     "expo-dev-client": "~5.0.9",
     "expo-image-manipulator": "~13.0.6",
