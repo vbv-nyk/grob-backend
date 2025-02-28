@@ -5,7 +5,6 @@ import https from 'https';
 import express, { Express, Request, Response } from 'express';
 import dotenv from "dotenv";
 import { initializeMongoDB } from './mongodb/intialize';
-import userRouter from "./routes/users";
 import gameRouter from "./routes/game";
 import challengeRouter from "./routes/challenge";
 import leaderboardRouter from "./routes/leaderboard";
@@ -21,7 +20,6 @@ initializeMongoDB();
 const app = express();
 
 app.use(express.json());
-app.use('/users', userRouter);
 app.use('/game', gameRouter);
 app.use('/challenge', challengeRouter);
 app.use('/leaderboard', leaderboardRouter);

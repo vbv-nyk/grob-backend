@@ -1,11 +1,11 @@
 // routes/game.ts
 import express from "express";
-import Destination from "../models/DestinationSchema";
+import Destination from "../models/destination";
 import mongoose from "mongoose";
 
 const router = express.Router();
 
-router.get("/clue", async (req, res) => {
+router.get("/start", async (req, res) => {
   try {
     const destinations = await Destination.aggregate([{ $sample: { size: 10 } }]);
     res.json(destinations);
@@ -14,12 +14,5 @@ router.get("/clue", async (req, res) => {
   }
 });
 
-router.post("/guess", (req, res) => {
-  res.send("Guess submitted");
-});
-
-router.get("/next", (req, res) => {
-  res.send("Next question");
-});
 
 export default router;
