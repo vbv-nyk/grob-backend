@@ -47,22 +47,7 @@ router.get("/:challengeId", async (req, res): Promise<any> => {
       return res.status(404).json({ error: "Challenge not found" });
     }
 
-    // Extract the questionIds from the challenge
-    const questionIds = challenge.questions.map(q => q.questionId);
-
-    // Fetch the 10 destinations that match these questionIds
-    const destinations = await Destination.find({ _id: { $in: questionIds } }).limit(10);
-
-    // Map each destination with its correctness status
-    const results = destinations.map(destination => {
-      const question = challenge.questions.find(q => q.questionId.equals(destination._id));
-      return {
-        ...destination.toObject(),
-        correct: question ? question.correct : false, // Default false if no match
-      };
-    });
-
-    res.json({ challenger: { username: challenge.username, score: challenge.score }, questions: results });
+    res.json({ challenger: { username: challenge.username, score: challenge.score }, questions: challenge.questions });
   } catch (error) {
     console.error("Error fetching challenge:", error);
     res.status(500).json({ error: "Internal Server Error" });
