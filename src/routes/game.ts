@@ -1,7 +1,7 @@
 // routes/game.ts
-import express from "express";
+import express, { Request, Response } from "express";
+import { body, validationResult } from "express-validator";
 import Destination from "../models/destination";
-import mongoose from "mongoose";
 
 const router = express.Router();
 router.get("/start", async (req, res) => {
@@ -40,24 +40,39 @@ router.get("/start", async (req, res) => {
   }
 });
 
-router.post("/submit-answer", async (req, res): Promise<any> => {
-  try {
-    const { questionId, selectedCity } = req.body;
 
-    // Find the correct answer from the database
-    const correctAnswer = await Destination.findById(questionId);
-
-    if (!correctAnswer) {
-      return res.status(400).json({ error: "Invalid question ID" });
+router.post(
+  "/submit-answer",
+  [
+    body("questionId").isMongoId().withMessage("Invalid question ID format"),
+    body("selectedCity").trim().escape().notEmpty().withMessage("City name is required"),
+  ],
+  async (req: Request, res: Response): Promise<any> => {
+    // Handle validation errors
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
     }
 
-    const isCorrect = correctAnswer.city === selectedCity;
+    try {
+      const { questionId, selectedCity } = req.body;
 
-    res.json({ correct: isCorrect, correctCity: correctAnswer.city });
+      // Find the correct answer from the database
+      const correctAnswer = await Destination.findById(questionId);
 
-  } catch (error) {
-    res.status(500).json({ error: "Internal Server Error" });
+      if (!correctAnswer) {
+        return res.status(404).json({ error: "Question not found" });
+      }
+
+      const isCorrect = correctAnswer.city === selectedCity;
+
+      res.json({ correct: isCorrect, correctCity: correctAnswer.city });
+
+    } catch (error) {
+      console.error("Error in submit-answer:", error);
+      res.status(500).json({ error: "Internal Server Error" });
+    }
   }
-});
+);
 
-export default router
+export default router;

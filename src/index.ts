@@ -1,13 +1,13 @@
 // index.ts (Updated)
 import fs from 'fs';
 import http from "http";
+import rateLimit from "express-rate-limit";
 import https from 'https';
 import express, { Express, Request, Response } from 'express';
 import dotenv from "dotenv";
 import { initializeMongoDB } from './mongodb/intialize';
 import gameRouter from "./routes/game";
 import challengeRouter from "./routes/challenge";
-import leaderboardRouter from "./routes/leaderboard";
 import cors from "cors"
 
 dotenv.config();
@@ -22,9 +22,14 @@ const app = express();
 app.use(cors())
 
 app.use(express.json());
-app.use('/game', gameRouter);
+const limiter = rateLimit({
+    windowMs: 60 * 1000, // 1 min
+    max: 10, // Allow 10 requests per minute per IP
+    message: "Too many requests, please try again later.",
+});
+
+app.use('/game', limiter, gameRouter);
 app.use('/challenge', challengeRouter);
-app.use('/leaderboard', leaderboardRouter);
 
 const httpServer = http.createServer(app);
 // const httpsServer = https.createServer(credentials, app);

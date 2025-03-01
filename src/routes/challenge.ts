@@ -1,7 +1,6 @@
 // routes/challenge.ts
 import express from "express";
 import Challenge from "../models/challenge";
-import Destination from "../models/destination";
 import { Username } from "../models/username";
 
 const router = express.Router();
