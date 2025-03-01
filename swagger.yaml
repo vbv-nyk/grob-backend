@@ -1,0 +1,244 @@
+openapi: 3.0.0
+info:
+  title: Trivia Game API
+  description: API for managing a trivia game, including starting the game, submitting answers, creating challenges, and fetching challenge details.
+  version: 1.0.0
+servers:
+  - url: https://reportease.ddns.net:3000
+paths:
+  /game/start:
+    get:
+      summary: Start a new game
+      description: Starts a new game by returning 10 random destinations with distractor cities and a fun fact.
+      operationId: startGame
+      responses:
+        '200':
+          description: Successfully started a game
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: string
+                      description: The unique ID of the destination.
+                    options:
+                      type: array
+                      items:
+                        type: string
+                      description: A list of options for the player to choose from.
+                    funFact:
+                      type: string
+                      description: A fun fact about the destination.
+                    clue:
+                      type: string
+                      description: A hint to help the player guess the correct city.
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: Internal Server Error
+
+  /game/submit-answer:
+    post:
+      summary: Submit an answer to a question
+      description: Submits the user's answer for a specific question to check if it's correct.
+      operationId: submitAnswer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - questionId
+                - selectedCity
+              properties:
+                questionId:
+                  type: string
+                  description: The ID of the question being answered.
+                selectedCity:
+                  type: string
+                  description: The city selected by the player.
+      responses:
+        '200':
+          description: Answer submission result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  correct:
+                    type: boolean
+                    description: Whether the player's answer was correct.
+                  correctCity:
+                    type: string
+                    description: The correct city.
+        '400':
+          description: Invalid request data (e.g., missing fields or invalid data format)
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: Invalid request data
+        '404':
+          description: Question not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: Question not found
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: Internal Server Error
+
+  /challenge/create:
+    post:
+      summary: Create a new challenge
+      description: This endpoint creates a new challenge, associates it with a username, and stores the questions and score.
+      operationId: createChallenge
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - username
+                - questions
+                - score
+              properties:
+                username:
+                  type: string
+                  description: The username of the person creating the challenge.
+                questions:
+                  type: array
+                  items:
+                    type: string
+                  description: An array of questions that the challenge will use.
+                score:
+                  type: integer
+                  description: The score achieved by the player in the challenge.
+      responses:
+        '201':
+          description: Challenge created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  challengeId:
+                    type: string
+                    description: The ID of the newly created challenge.
+        '400':
+          description: Invalid request data (e.g., missing fields or invalid data format)
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: Invalid request data
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: Internal Server Error
+
+  /challenge/{challengeId}:
+    get:
+      summary: Get details of a specific challenge
+      description: Fetches the details of an existing challenge using its challenge ID.
+      operationId: getChallengeById
+      parameters:
+        - name: challengeId
+          in: path
+          required: true
+          description: The unique identifier of the challenge to retrieve.
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Challenge details successfully retrieved
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  challenger:
+                    type: object
+                    properties:
+                      username:
+                        type: string
+                        description: The username of the person who created the challenge.
+                      score:
+                        type: integer
+                        description: The score achieved in the challenge.
+                  questions:
+                    type: array
+                    items:
+                      type: string
+                    description: The list of questions associated with the challenge.
+        '404':
+          description: Challenge not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: Challenge not found
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: Internal Server Error
+
+components:
+  schemas:
+    Challenge:
+      type: object
+      properties:
+        username:
+          type: string
+          description: The username of the player who created the challenge.
+        questions:
+          type: array
+          items:
+            type: string
+          description: A list of questions in the challenge.
+        score:
+          type: integer
+          description: The score the user achieved in the challenge.

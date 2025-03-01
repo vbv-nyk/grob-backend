@@ -9,6 +9,13 @@ import { initializeMongoDB } from './mongodb/intialize';
 import gameRouter from "./routes/game";
 import challengeRouter from "./routes/challenge";
 import cors from "cors"
+import YAML from "yamljs";
+import swaggerUi from "swagger-ui-express";
+
+// Load the Swagger YAML file
+const swaggerDocument = YAML.load("swagger.yaml");
+
+
 
 dotenv.config();
 initializeMongoDB();
@@ -22,13 +29,15 @@ const app = express();
 app.use(cors())
 
 app.use(express.json());
-const limiter = rateLimit({
-    windowMs: 60 * 1000, // 1 min
-    max: 10, // Allow 10 requests per minute per IP
-    message: "Too many requests, please try again later.",
-});
+// Serve Swagger UI at /docs
+app.use("/docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+// const limiter = rateLimit({
+//     windowMs: 60 * 1000, // 1 min
+//     max: 10, // Allow 10 requests per minute per IP
+//     message: "Too many requests, please try again later.",
+// });
 
-app.use('/game', limiter, gameRouter);
+app.use('/game', gameRouter);
 app.use('/challenge', challengeRouter);
 
 const httpServer = http.createServer(app);
