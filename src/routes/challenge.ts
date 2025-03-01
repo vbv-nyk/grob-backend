@@ -45,7 +45,6 @@ router.get("/:challengeId", async (req, res): Promise<any> => {
     if (!challenge) {
       return res.status(404).json({ error: "Challenge not found" });
     }
-
     res.json({ challenger: { username: challenge.username, score: challenge.score }, questions: challenge.questions });
   } catch (error) {
     console.error("Error fetching challenge:", error);
