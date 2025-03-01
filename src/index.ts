@@ -13,11 +13,11 @@ import cors from "cors"
 dotenv.config();
 initializeMongoDB();
 
-// const privateKey = fs.readFileSync('./privkey1.pem', 'utf8');
-// const certificate = fs.readFileSync('./cert1.pem', 'utf8');
-// const ca = fs.readFileSync('./chain1.', 'utf8');
+const privateKey = fs.readFileSync('./privkey1.pem', 'utf8');
+const certificate = fs.readFileSync('./cert1.pem', 'utf8');
+const ca = fs.readFileSync('./chain1.pem', 'utf8');
 
-// const credentials = { key: privateKey, cert: certificate, ca: ca };
+const credentials = { key: privateKey, cert: certificate, ca: ca };
 const app = express();
 app.use(cors())
 
@@ -32,9 +32,9 @@ app.use('/game', limiter, gameRouter);
 app.use('/challenge', challengeRouter);
 
 const httpServer = http.createServer(app);
-// const httpsServer = https.createServer(credentials, app);
+const httpsServer = https.createServer(credentials, app);
 
 httpServer.listen(4000, () => console.log('HTTP Server running on port 4000'));
-// httpsServer.listen(3000, () => console.log('HTTPS Server running on port 3000'));
+httpsServer.listen(3000, () => console.log('HTTPS Server running on port 3000'));
 
 export default httpServer
